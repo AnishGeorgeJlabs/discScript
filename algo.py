@@ -2,7 +2,7 @@ import csv
 
 import pymysql
 
-from var import v_color
+from var import v_color, v_others
 from souper import get_data
 
 
@@ -34,6 +34,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         # --------------------
 
         product, soup = get_data(url)
+        specs = product.get("specs")
 
         if False:  # todo, check if the link is not alive
             with open('skipped_links.csv', 'a+') as cfile:
@@ -56,15 +57,36 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error("Error in number of images",
                          "site: %i, actual: %s" % (product['n_images'], str(n_bricks[0][1])))
 
-        # ------ CHK 2, Grinding the description ------
+        # ------ CHK 2, Grinding the Model stats ------
+        model_stats = specs.get('model stats')
+
         # --------- CHK 2.1, Size check ---------------
 
         if len(product['sizes']) > 1 and not product['has_size_chart']:
-            record_error("Chart Absent", "%i sizes available" % len(product['sizes']))
+            record_error("Size Chart Absent", "%i sizes available" % len(product['sizes']))
+        elif len(product['sizes']) == 1 and product['sizes'][0] in v_others.dumb_sizes and \
+                product['has_size_chart']:
+            record_error("Size Chart present with Free size/Standard/Regular")
 
-        desc_size = None
-        if product['desc'] and 'size' in product['desc']:
-            desc_size = product['desc'].split('size')[1].strip(" .")
+        desc_sizes = None  # Size specified if any in model stats
+        if model_stats and 'size' in model_stats:
+            halves = model_stats.split('size')
+            desc_sizes = list({
+                halves[0].split(" ")[-1].strip(" ."),
+                halves[1].split(" ")[0].strip(" .")})
+
+            '''
+            # If we have a size array, todo, debatable
+            if len(product['sizes']) > 1 and \
+                any(x in v_others.dumb_sizes for x in desc_sizes):
+                record_error("Free/Standard/Regular mentioned as size for model")
+            '''
+            # That should do the trick
+            if len(product['sizes']) > 0 and \
+                    all(x not in product['sizes'] for x in desc_sizes):
+                record_error("Size worn by model not available for selection")
+            elif all(x not in v_others.dumb_sizes for x in desc_sizes):
+                record_error("Size worn by model is unknown")
 
     except:
         pass

@@ -1,6 +1,8 @@
 height_range = ['5\'1\"', '5\'2\"', '5\'3\"', '5\'4\"', '5\'5\"', '5\'6\"', '5\'7\"', '5\'8\"', '5\'9\"', '5\'10',
                 '5\'11', '6\'0\"', '6\'1\"', '6\'2\"', '6\'3\"', '6\'4\"', '6\'5\"', '6\'6\"']
 
+dumb_sizes = ['free', 'standard', 'regular']
+
 shadecard_bricks = ["eye pencil", "eye shadow", "lip liner", "eye liner", "lipstick", "lips gloss", "make-up base",
                     "nail enamel", "mascara", "compact powder", "blusher",
                     "lip balm", "lip care", "loose powder", "concealer & corrector", "face highlighter", "highlighter",

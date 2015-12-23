@@ -34,7 +34,7 @@ def get_data(url):
     for item in spec_list:
         if 'authorized-brand' in item.get('class', []):
             continue
-        specs[item.label.string.strip().lower()] = item.span.string
+        specs[item.label.string.strip().lower()] = item.span.string.strip().lower()
     res['specs'] = specs
 
     # Get the item's category hierarchy from breadcrumbs
@@ -61,7 +61,10 @@ def get_data(url):
     else:
         items = size_blk.find_all("li")
         items = [x.find("span") for x in items if x]
-        sizes = [x.string.strip() for x in items if x and x.string]
+        sizes = [x.string.strip().lower() for x in items if x and x.string]
+        for x in sizes:
+            x = x.replace("size", '').strip()
+
     res['sizes'] = sizes
 
     return res, soup
