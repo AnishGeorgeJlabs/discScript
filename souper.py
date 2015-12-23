@@ -25,6 +25,8 @@ def get_data(url):
         "desc": find_by_class("prod-disc", "h2"),
         "n_images": len(soup.find("div", class_="product-carousel").find_all("img"))
     }
+    if res['desc']:
+        res['desc'] = res['desc'].lower()
 
     # Get specifications
     spec_list = soup.find("ul", class_="prod-main-wrapper").find_all("li")
