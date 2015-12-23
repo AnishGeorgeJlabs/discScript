@@ -39,6 +39,8 @@ def get_data(url):
             continue
         specs[item.label.string.strip().lower()] = item.span.string.strip().lower()
     res['specs'] = specs
+    if 'model stats' in res['specs']:
+        res['model_data'] = extract_model_stats(res['specs']['model stats'])
 
     # Get the item's category hierarchy from breadcrumbs
     bread = [
@@ -71,6 +73,19 @@ def get_data(url):
     res['sizes'] = sizes
 
     return res, soup
+
+def extract_model_stats(stats):
+    data = [s.strip(" .") for s in stats.replace(',', ' ').split(" ") if s]
+    res = {}
+    for key in ["height", "chest", "waist", "bust", "hip", "hips"]:
+        if key in data:
+            res[key] = data[data.index(key) + 1]
+    if "size" in data:      # cannot be sure if keyword is before or after "size"
+        idx = data.index("size")
+        res['size'] = [data[idx - 1]]
+        if len(data) >= idx + 2:
+            res['size'].append(data[idx + 1])
+    return res
 
 if __name__ == "__main__":
     printer = pprint.PrettyPrinter(indent=2)
