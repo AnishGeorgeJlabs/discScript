@@ -26,9 +26,10 @@ def get_data(url):
         specs[item.label.string.lower()] = item.span.string
     res['specs'] = specs
 
-    return res
+    return res, soup
 
 
 if __name__ == "__main__":
     url = "http://www.jabong.com/phosphorus-Mandarin-collar-oxford-casual-shirt-1570940.html?pos=1"
-    print get_data(url)
+    prod, soup = get_data(url)
+    print prod
