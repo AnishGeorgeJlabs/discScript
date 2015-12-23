@@ -67,6 +67,7 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
 
                 # d = enchant.Dict("en_GB","")
                 # d = enchant.DictWithPWL("en_GB","testdict.txt")
+                # ------------------- Checkpoint, beautiful soup -------------------------------------------------------
                 name = soup.find("span", "fs11 c222").string.strip('\t\n ').lower()  # Name alongside Brick
                 brand_name = soup.find("span", "brand-name fs22 full-width").string.strip('\t\n ')  # Brand Name
                 name_below_brand = soup.find("span", "mb3 full-width").string.strip('\t\n ').lower()  # Name below Brand
@@ -96,6 +97,8 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                             tnumbrick[0][1])
                 except:
                     hi = "Hello"
+
+                # ---------------------------- Checkpoint, start descripencies here ------------------------------------
                 qq = ""
                 if pic_desc and "size" in pic_desc:
                     qq = pic_desc.split("size")[1].strip(" ").strip(".")
@@ -308,13 +311,13 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                         try:
                             value = details['strap color']
                             if value:
-                                color = " " + details['strap color'] + " "
+                                color = details['strap color']
 
                         except KeyError:
                             hi = "hellop"
                     elif watches in "sunglasses":
                         if 'lens color' in details.keys():
-                            color = " " + details['lens color'] + " "
+                            color = details['lens color']
                             if 'frame color' in details.keys():
                                 if details['frame color'].strip() not in color_in_name:
                                     if details['frame color'].strip().replace(" ", "-") not in color_in_name:
@@ -336,13 +339,14 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                             ecode += ",No Color"
                             color = "No Color"
                     elif 'color' in details.keys():
-                        color = " " + details['color'] + " "
+                        color = details['color']
 
                     else:
                         ecode += ",No Color"
                         color = "No Color"
 
-                if color.strip() in "na" or color.strip() in "n/a":
+                color = color.strip().replace(" ", "-")
+                if color in ["na","n/a"]:
                     ecode += ",Color N/A error"
                 if 'material' in details.keys():
                     material = details['material']
@@ -469,14 +473,14 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                     e_brand = "Error in name_below_brand"
 
                 if 'assorted' in name_below_brand:
-                    if 'multi' in color.strip():
+                    if 'multi' in color:
                         ecode += ",Multi is mentioned in color"
-                    elif 'assorted' in color.strip():
+                    elif 'assorted' in color:
                         ecode += ""
                 if 'multi' in name_below_brand:
-                    if 'assorted' in color.strip():
+                    if 'assorted' in color:
                         ecode += ",Assorted is mentioned in color"
-                    elif 'multi' in color.strip():
+                    elif 'multi' in color:
                         ecode += ""
                         # color
                 if color in v_color.all:
@@ -500,11 +504,11 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                     scolo = {0: "multi"}
                 colordiff = []
                 color1 = []
-                if scolo:
+                if scolo:                           # ------------------------- Checkpoint -----------------------------
                     p = []
                     p = scolo.values()
-                    p = [' ' + x.replace(" ", "-") + ' ' for x in p]  # to match the color descriptions accurately.
-                    tempcolor = " " + "-".join(color.strip().split(" ")) + " "
+                    p = [x.strip().replace(" ", "-") for x in p]  # to match the color descriptions accurately
+                    tempcolor = "-".join(color.strip().split(" "))
                     if tempcolor in v_color.grey and list(set(p) & set(v_color.grey)):
                         flag = 0
                         for x in list(set(p) & set(v_color.grey)):
@@ -663,4 +667,45 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
         del dba
         sys.exc_clear()
         sys.exc_traceback = sys.last_traceback = None
-        #	pass
+
+# --------------------------------------------------- Checkpoint 3 -----------------------------------------------------
+
+farm = open("xaa", "r")
+farmdata = csv.reader(farm)
+ddddd = []
+for x in farmdata:
+    ddddd.append(x)
+farm.close()
+while (1):
+    # db=_mysql.connect(host="localhost",user="root",passwd="jabong@123",db="discrepancy")
+
+    try:
+        if count == 1 and sys.argv[2].strip() is "1":
+            dba = pymysql.connect(host="localhost", user="root", passwd="", db="discrepancy")  # discrpancy
+            db = dba.cursor()
+            selq = "INSERT IGNORE INTO runat (`Start_time`,`code`) VALUES ('" + time.strftime(
+                "%Y-%m-%d") + " " + time.strftime("%X") + "','" + sys.argv[1] + "')"
+            db.execute(selq)
+            dba.commit()
+            del db
+            del dba
+        url = ddddd.pop()
+        get_articles(url[10].strip("\"\n\r"), url[9].strip("\"\n\r"), url[4].strip("\"\n\r"), url[2].strip("\"\n\r"),
+                     url[0].strip("\"\n\r"), url[1].strip("\"\n\r"), url[8].strip("\"\n\r"), url[11].strip("\"\n\r"))
+
+        # get_articles(url[10].strip("\"\n\r"),url[9].strip("\"\n\r"),url[4].strip("\"\n\r"),url[2].strip("\"\n\r"),url[0].strip("\"\n\r"),url[1].strip("\"\n\r"),url[8].strip("\"\n\r"))
+        count = count + 1
+        sys.exc_clear()
+        sys.exc_traceback = sys.last_traceback = None
+    except IndexError:
+        print "correct the csv and retry"
+    # raise
+    except EOFError:
+        dba = pymysql.connect(host="localhost", user="root", passwd="", db="discrepancy")  # discrpancy
+        db = dba.cursor()
+        selq = "UPDATE runat SET `end_time`= '" + time.strftime("%Y-%m-%d") + " " + time.strftime(
+            "%X") + "' WHERE code = '" + sys.argv[1] + "'"
+        db.execute(selq)
+        dba.commit()
+        html = requests.get("http://202.191.153.65/ankit/discre.php?rr=" + sys.argv[2])
+        quit()
