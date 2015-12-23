@@ -2,6 +2,9 @@ from bs4 import BeautifulSoup
 import pprint
 import requests
 
+url1 = "http://www.jabong.com/phosphorus-Mandarin-collar-oxford-casual-shirt-1570940.html?pos=1"
+url2 = "http://www.jabong.com/park-avenue-Blue-Striped-Slim-Fit-Formal-Shirt-1623073.html?pos=2"
+url3 = "http://www.jabong.com/phosphorus-Andrew-Hill-Formal-Collection-1489771.html?pos=4"
 
 def get_data(url):
     """ Get the Product data by scrapping off page
@@ -71,8 +74,5 @@ def get_data(url):
 
 if __name__ == "__main__":
     printer = pprint.PrettyPrinter(indent=2)
-    url1 = "http://www.jabong.com/phosphorus-Mandarin-collar-oxford-casual-shirt-1570940.html?pos=1"
-    url2 = "http://www.jabong.com/park-avenue-Blue-Striped-Slim-Fit-Formal-Shirt-1623073.html?pos=2"
-    url3 = "http://www.jabong.com/phosphorus-Andrew-Hill-Formal-Collection-1489771.html?pos=4"
-    prod, soup = get_data(url3)
+    prod, soup = get_data(url2)
     printer.pprint(prod)
