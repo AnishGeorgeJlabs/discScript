@@ -64,6 +64,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
 
         # ------ CHK 2, Grinding the Model stats ------
         model_stats = specs.get('model stats')
+        model_data = product.get('model_data')
 
         # --------- CHK 2.1, Size check ---------------, Todo, work on the popup S,M,L sizes
 
@@ -73,13 +74,8 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 product['has_size_chart']:
             record_error("Size Chart present with Free size/Standard/Regular")
 
-        desc_sizes = None  # Size specified if any in model stats
-        if model_stats and 'size' in model_stats:
-            halves = [x.strip() for x in model_stats.split('size')]
-            desc_sizes = list({
-                halves[0].split(" ")[-1].strip(" ."),
-                halves[-1].split(" ")[0].strip(" .")})
-
+        if model_data and 'size' in model_data:
+            desc_sizes = model_data['size']
             '''
             # If we have a size array, todo, debatable
             if len(product['sizes']) > 1 and \
@@ -120,4 +116,4 @@ def testFunc():
 if __name__ == "__main__":
     from souper import url1, url2, url3
 
-    main_algorithm(url1, sku="TestSub 1")
+    main_algorithm(url2, sku="TestSub 1")
