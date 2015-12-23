@@ -7,7 +7,7 @@ shadecard_bricks = ["eye pencil", "eye shadow", "lip liner", "eye liner", "lipst
                     "nail art", "kajal", "nail top & base coat", "eye palette"]
 beauty = ["strech denim"]  # beauty and fragnances
 toys = ["100% linen"]
-Actsprts = ["polyester", "polyester spandex", "poly cotton"]
+actsprts = ["polyester", "polyester spandex", "poly cotton"]
 jewellery = ["bones", "pu", "metal", "leather/brass", "92.5 silver", "pewter", "leather", "tungsten", "thread",
              "steel", "crystal", "sterling silver", "copper", "brass & leather", "swarovski elements",
              "semi-precious stones", "copper alloy", "resin", "wooden", "titanium", "metal/leather", "brass & beads",
