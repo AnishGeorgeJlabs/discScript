@@ -20,11 +20,13 @@ def main_algorithm( url, prod_id="", brick="", category="", sku="", brand="", mr
 
         product, soup = get_data(url)
 
-        if False:
+        if False:           # todo, check if the link is not alive
             with open('skipped_links.csv', 'a+') as cfile:
                 writer = csv.writer(cfile)
                 writer.writerow([url])
                 return
+
+        errors = []
 
     except:
         pass
