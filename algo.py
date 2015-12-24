@@ -62,12 +62,11 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 record_error("Error in number of images",
                              "site: %i, actual: %s" % (product['n_images'], str(n_bricks[0][1])))
 
-        # ------ CHK 2, Grinding the Model stats ------
+        # ------ CHK 2, Grinding the Model stats ---------------------------------------------------
         model_stats = specs.get('model stats')
         model_data = product.get('model_data')
 
-        # --------- CHK 2.1, Size check ---------------, Todo, work on the popup S,M,L sizes
-
+        # --------- CHK 2.1, Size check ---------------
         if len(product['sizes']) > 1 and not product['has_size_chart']:
             record_error("Size Chart Absent", "%i sizes available" % len(product['sizes']))
         elif len(product['sizes']) == 1 and product['sizes'][0] in v_others.dumb_sizes and \
@@ -76,19 +75,25 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
 
         if model_data and 'size' in model_data:
             desc_sizes = model_data['size']
-            '''
-            # If we have a size array, todo, debatable
-            if len(product['sizes']) > 1 and \
-                any(x in v_others.dumb_sizes for x in desc_sizes):
-                record_error("Free/Standard/Regular mentioned as size for model")
-            '''
-            # That should do the trick
             if all(x not in product['sizes'] for x in desc_sizes):
                 if len(product['sizes']) > 0:
                     record_error("Size worn by model not available for selection",
                                  "%s, %s" % (str(desc_sizes[0]), str(desc_sizes[-1])))
                 elif all(x not in v_others.dumb_sizes for x in desc_sizes):
                     record_error("Size worn by model is unknown")
+
+            # ----- CHK 2.2, Body measurements --------
+            if "hips" in model_data:
+                record_error("Hips mentioned in Model stats")
+
+            for key in ["chest", "waist", "bust", "hip", "hips"]:
+                if key in model_data:
+                    val = model_data[key][:2]
+                    if not unicode(val).isnumeric():
+                        record_error("Invalid %s size" % key, str(val))
+
+            if "height" in model_data and model_data['height'] not in v_others.height_range:
+                record_error("Invalid height", str(model_data['height']))
 
     except:
         pass
@@ -116,4 +121,4 @@ def testFunc():
 if __name__ == "__main__":
     from souper import url1, url2, url3
 
-    main_algorithm(url2, sku="TestSub 1")
+    main_algorithm(url3, sku="TestSub 1")
