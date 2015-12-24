@@ -38,3 +38,14 @@ style = ["embellished", "embroidered", "checks", "anarkali", "printed", "cardiga
          "bodycon dress", "hoodie", "non wired-padded", "patiala", "low waist", "medium waist", "elasticated", "wrap",
          "ethnic", "floral", "graphic", "jacquard", "sports bra-non padded", "pleated", "patch work", "unstitched",
          "underwired-padded", "pintucks"]
+
+data_map = {
+    "closing": closing,
+    "neck": neck,
+    "linning": linning,
+    "fit": fit,
+    "heelshape": heelshape,
+    "sleeves": sleeves,
+    "length": length,
+    "style": style
+}

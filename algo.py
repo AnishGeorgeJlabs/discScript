@@ -2,7 +2,7 @@ import csv
 
 import pymysql
 
-from var import v_color, v_others
+from var import v_color, v_others, v_adv
 from souper import get_data
 
 use_db = False
@@ -49,11 +49,13 @@ def extract_colors(desc):
 
     return [c.replace(" ", "-") for c in f_color_dic.keys()]
 
+
 if __name__ == '__main__':
     p1 = "Get these brown pants. Team it with white shirt".lower()
     p2 = "These navy blue trousers are worth the buck".lower()
     p3 = "These navy blue trousers are the bang. With a blue crease".lower()
     print "Colors: ", extract_colors(p3)
+
 
 def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp="", item_type=""):
     """
@@ -140,7 +142,14 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error("Discription Not Present")
         else:
             # ------ CHK 4.1, Color ---------------------------
-            pass
+            desc_data = {"color": extract_colors(product['desc'])}
+            # ------ CHK 4.2, Rest of the fields --------------
+            for key in ['closing', 'neck', 'linning', 'fit', 'heelshape', 'sleeves', 'length', 'style']:
+                desc_data[key] = []
+                for i in v_adv.data_map[key]:
+                    if " %s " % i in product['desc']:
+                        desc_data[key].append(i)
+            desc_data['fit'] = [x.replace(" ", "-").strip() for x in desc_data['fit']]
 
 
     except:
