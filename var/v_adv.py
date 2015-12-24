@@ -9,7 +9,7 @@ neck = ["hooded neck", "halter neck", "shawl collar", "keyhole neck", "bow tie n
         "round neck", "boat neck", "collar neck", "lapel collar", "open neck", "high neck", "mock neck",
         "asymmetric neck"]
 
-linning = ["croslite", "polycarbonate", "embroidered", "printed", "velvet", "polarised", "non leather", "jacquard",
+lining = ["croslite", "polycarbonate", "embroidered", "printed", "velvet", "polarised", "non leather", "jacquard",
            "rubber like (eva)", "mesh", "leather", "uv protected", "yes", "synthetic", "plain", "fabric"]
 
 fit = ["comfort-fit", "comfort fit", "loose fit", "slim fit", "narrow fit", "slim-fit", "pencil fit", "pencil-fit",
@@ -42,7 +42,7 @@ style = ["embellished", "embroidered", "checks", "anarkali", "printed", "cardiga
 data_map = {
     "closing": closing,
     "neck": neck,
-    "linning": linning,
+    "lining": lining,
     "fit": fit,
     "heelshape": heelshape,
     "sleeves": sleeves,

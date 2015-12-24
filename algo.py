@@ -50,11 +50,13 @@ def extract_colors(desc):
     return [c.replace(" ", "-") for c in f_color_dic.keys()]
 
 
+'''
 if __name__ == '__main__':
     p1 = "Get these brown pants. Team it with white shirt".lower()
     p2 = "These navy blue trousers are worth the buck".lower()
     p3 = "These navy blue trousers are the bang. With a blue crease".lower()
     print "Colors: ", extract_colors(p3)
+    '''
 
 
 def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp="", item_type=""):
@@ -138,18 +140,29 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 record_error("Invalid height", str(model_data['height']))
 
         # ------- CHK 4, Extracting data from description ------------------------------------------
+        spec_fields = ['closing', 'neck', 'lining', 'fit', 'heelshape', 'sleeves', 'length', 'style']
+        desc_data = {}
         if not product.get('desc'):
             record_error("Discription Not Present")
         else:
-            # ------ CHK 4.1, Color ---------------------------
-            desc_data = {"color": extract_colors(product['desc'])}
+            # ------ CHK 4.1, Colors --------------------------
+            desc_data["color"] = extract_colors(product['desc'])
             # ------ CHK 4.2, Rest of the fields --------------
-            for key in ['closing', 'neck', 'linning', 'fit', 'heelshape', 'sleeves', 'length', 'style']:
+            for key in spec_fields:
                 desc_data[key] = []
                 for i in v_adv.data_map[key]:
                     if " %s " % i in product['desc']:
                         desc_data[key].append(i)
-            desc_data['fit'] = [x.replace(" ", "-").strip() for x in desc_data['fit']]
+            desc_data['fit'] = [x.replace("fit", "").replace('-', ' ').strip() for x in desc_data['fit']]
+
+        color_in_name = extract_colors(product['name'].lower())
+
+        # ------ CHK 5, Basic Checks of description against specs ----------------------------------
+        for k, v in desc_data.items():
+            for item in v:
+                if item not in product['specs'].get(k, ""):
+                    record_error("%s details mismatch in description" % k, "desc: %s, specs: %s" % (str(v), str(product['specs'].get(k, ''))))
+
 
 
     except:
@@ -174,9 +187,7 @@ def testFunc():
     finally:
         print "That's right, we did it"
 '''
-'''
 if __name__ == "__main__":
     from souper import url1, url2, url3
 
-    main_algorithm(url3, sku="TestSub 1")
-    '''
+    main_algorithm(url1, sku="TestSub 1")

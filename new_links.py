@@ -237,7 +237,7 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                     if m in de:
                         cid.append(m)
                 liid = []
-                for m in v_adv.linning:
+                for m in v_adv.lining:
                     if m in de:
                         liid.append(m)
                 hid = []
