@@ -8,6 +8,16 @@ all = ["white", "brown", "aqua-blue", "metal", "golden", "rust", "steel-grey", "
               "apricot", "magenta", "blue", "ice-blue", "bronze", "firozi", "citrine", "multi"
               ]
 
+'''
+complete = []
+for color in all:
+    complete.append(color)
+    if '-' in color:
+        complete.append(color.replace("-", ' '))
+'''
+spaced_colors = [x.replace('-', ' ') for x in filter(lambda c: "-" in c, all)]
+complete = spaced_colors + all
+
 grey = ["grey", "dark-grey", "light-grey", "steel-grey", "charcoal-grey"]
 milange = ["grey-milange", "milange"]
 red = ["brick-red", "red"]

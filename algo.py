@@ -16,6 +16,45 @@ def find_parent(c):
             return k
 
 
+def split_para(p):
+    """
+    :param p: Paragraph
+    :return: A list of words
+    """
+    return [
+        word.strip(" .")
+        for word in p.replace(',', ' ').split(' ')
+        if word
+        ]
+
+
+def extract_colors(desc):
+    # step 1, find any of the colors directly in desc
+    f_colors = []
+    ndesc = desc
+    for color in v_color.complete:
+        if " %s " % color in ndesc:
+            f_colors.append(color)
+            ndesc = ndesc.replace(color, "")
+
+    # step 3, find the previous 3 words
+    f_color_dic = {}
+    for color in f_colors:
+        f_color_dic[color] = split_para(desc.split(color)[0])[-3:]
+
+    # step 4, remove anything that is an auxilary teaming thingy
+    for k, v in f_color_dic.items():
+        if "with" in v and any(key in v for key in ['team', 'pair', 'club', 'wear', 'style', 'combine']):
+            f_color_dic.pop(k)
+
+    return [c.replace(" ", "-") for c in f_color_dic.keys()]
+
+if __name__ == '__main__':
+    p1 = "Get these brown pants. Team it with white shirt".lower()
+    p2 = "These navy blue trousers are worth the buck".lower()
+    p3 = "These navy blue trousers are the bang. With a blue crease".lower()
+    print "Colors: ", extract_colors(p3)
+
 def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp="", item_type=""):
     """
     Main algorithm, a mess it is
@@ -83,7 +122,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                     elif all(x not in v_others.dumb_sizes for x in desc_sizes):
                         record_error("Size worn by model is unknown")
 
-            # --------- CHK 2.2, Body measurements --------
+            # --------- CHK 3.2, Body measurements --------
             if "hips" in model_data:
                 record_error("Hips mentioned in Model stats")
 
@@ -95,6 +134,14 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
 
             if "height" in model_data and model_data['height'] not in v_others.height_range:
                 record_error("Invalid height", str(model_data['height']))
+
+        # ------- CHK 4, Extracting data from description ------------------------------------------
+        if not product.get('desc'):
+            record_error("Discription Not Present")
+        else:
+            # ------ CHK 4.1, Color ---------------------------
+            pass
+
 
     except:
         pass
@@ -118,8 +165,9 @@ def testFunc():
     finally:
         print "That's right, we did it"
 '''
-
+'''
 if __name__ == "__main__":
     from souper import url1, url2, url3
 
     main_algorithm(url3, sku="TestSub 1")
+    '''
