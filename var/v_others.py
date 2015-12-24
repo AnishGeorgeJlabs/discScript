@@ -108,3 +108,7 @@ upper_material = ["genuine leather", "suede leather", "mesh, synthetic leather",
 footwear_mat = ["plastic moulded footwear", "cotton", "pvc", "non leather", "leather", "na"]
 sole_material = ["tpr", "leather", "rubber", "rubber like (eva)", "pu", "pvc", "phylon", "eva", "resin sheet", "airmax",
                  "tpu", "cork", "croslite", "crape", "non marking rubber"]
+
+bag_list = ["sling bag", "backpack", "duffel bags", "bags", "laptop bag", "laptop backpack",
+            "messenger bags", "shopping bag", "school bag", "travelling bag", "sports bag",
+            "laptop briefcase", "multiutility bag"]

@@ -182,6 +182,7 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                             "messenger bags", "shopping bag", "school bag", "travelling bag", "sports bag",
                             "laptop briefcase", "multiutility bag"]
 
+                # --------- Stats ----------
                 temp = len(row)
                 description = " " + description
                 c = count
