@@ -1,6 +1,7 @@
 import csv
 
 import pymysql
+import re
 
 from var import v_color, v_others, v_adv
 from souper import get_data
@@ -33,7 +34,7 @@ def extract_colors(desc):
     f_colors = []
     ndesc = desc
     for color in v_color.complete:
-        if " %s " % color in ndesc:
+        if re.search(r"\b%s\b" % color, ndesc, re.IGNORECASE):
             f_colors.append(color)
             ndesc = ndesc.replace(color, "")
 
@@ -151,7 +152,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             for key in spec_fields:
                 desc_data[key] = []
                 for i in v_adv.data_map[key]:
-                    if " %s " % i in product['desc']:
+                    if re.search(r'\b%s\b'%(i), product['desc'], re.IGNORECASE):
                         desc_data[key].append(i)
             desc_data['fit'] = [x.replace("fit", "").replace('-', ' ').strip() for x in desc_data['fit']]
 
@@ -162,6 +163,8 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             for item in v:
                 if item not in product['specs'].get(k, ""):
                     record_error("%s details mismatch in description" % k, "desc: %s, specs: %s" % (str(v), str(product['specs'].get(k, ''))))
+
+        # ------ CHK 6, Segment - category specific checks -----------------------------------------
 
 
 
