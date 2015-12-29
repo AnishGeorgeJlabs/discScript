@@ -470,6 +470,7 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                     if "height" not in pic_desc:
                         ecode += ",Incomplete mannequin vitals"
 
+                # TODO, later
                 if material:
                     mat = {}
                     m = map(str, regex.findall(r'\d+', material)) + map(str, regex.findall(r'%', material))

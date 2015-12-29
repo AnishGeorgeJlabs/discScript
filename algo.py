@@ -1,8 +1,7 @@
 import csv
+
 import re
-
 import pymysql
-
 from var import v_color, v_others, v_adv
 from souper import get_data
 
@@ -28,9 +27,11 @@ def split_para(p):
         if word
         ]
 
+
 def clean_para(p):
     freg = re.compile(r'\W+')
     return freg.sub(" ", p)
+
 
 def extract_colors(desc):
     # step 1, find any of the colors directly in desc
@@ -186,13 +187,34 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         elif any(x in spec_colors for x in ['na', 'n/a']):
             record_error("Color N/A error")
 
-        # ------ CHK 7, Material details and miscellaneous -----------------------------------------
-        material_details = v_others.data_map.get(category.lower(), '')
+        # ------ CHK 7, random stuff ---------------------------------------------------------------
         is_bag = brick.lower() in v_others.bag_list
         if (category.lower() == "apparel" or is_bag) and not model_data:
             record_error("Model Vitals Absent")
         elif is_bag and model_data and "height" not in model_data:
             record_error("Incomplete Model Vitals")
+
+        # ------ CHK 8, Material check -------------------------------------------------------------
+        material = specs.get("material")  # ASSUMPTION, gives a single material
+        if material:
+            pat = re.compile(r"(\d+|%)")
+            material_details = v_others.data_map.get(category.lower(), '')
+
+            desc_materials = set()
+            for md in material_details:
+                if re.search(r"\b%s\b" % md, product.get('desc', '')):
+                    md = pat.sub('', md)
+                    desc_materials.add(md)
+
+            if len(desc_materials):
+                c_material = pat.sub('', material)
+                if c_material not in desc_materials:
+                    record_error("Mismatch in material",
+                                 "specs: %s, description: %s" % (str(material), str(desc_materials)))
+
+
+
+
 
 
     except Exception, e:
@@ -219,6 +241,6 @@ def testFunc():
         print "That's right, we did it"
 '''
 if __name__ == "__main__":
-    from souper import url1, url_sunglass
+    from souper import url_sunglass
 
     main_algorithm(url_sunglass, sku="TestSub 1")
