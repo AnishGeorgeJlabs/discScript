@@ -6,6 +6,7 @@ url1 = "http://www.jabong.com/phosphorus-Mandarin-collar-oxford-casual-shirt-157
 url2 = "http://www.jabong.com/park-avenue-Blue-Striped-Slim-Fit-Formal-Shirt-1623073.html?pos=2"
 url3 = "http://www.jabong.com/phosphorus-Andrew-Hill-Formal-Collection-1489771.html?pos=4"
 url_sunglass = "http://www.jabong.com/park-avenue-Brown-Black-Aviator-Sunglasses-1534465.html?pos=1"
+url_multi = "http://www.jabong.com/jaipur-kurti-Multi-Colored-Printed-Cotton-Salwar-Kameez-Dupatta-1790943.html?pos=1"
 
 def get_complete_string(soup):
     return reduce(lambda a,b: a + b,
@@ -28,7 +29,7 @@ def get_data(url):
             return None
 
     res = {
-        "name": find_by_class("product-title"),
+        "name": find_by_class("product-title").lower(),
         "brand": find_by_class("brand"),
         "has_size_chart": bool(soup.find(id="size-block").find("a", class_="help dialogify")),     # todo, recheck
         "desc": find_by_class("prod-disc", "h2"),

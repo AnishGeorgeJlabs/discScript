@@ -212,6 +212,20 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                     record_error("Mismatch in material",
                                  "specs: %s, description: %s" % (str(material), str(desc_materials)))
 
+        # ------ CHK 9, Assorted and multi ---------------------------------------------------------
+        def check_assorted_multi(a,b):
+            if a in product['name']:
+                if b in spec_colors:
+                    record_error("%s is mentioned in color" % b.title())
+                elif a not in spec_colors and len(spec_colors):
+                    record_error("%s is missing in color" % a.title())
+                return True
+            else:
+                return False
+
+        if check_assorted_multi("assorted", "multi") and check_assorted_multi("multi", "assorted"):
+            record_error("Both of assorted and multi are mentioned in name")
+
 
 
 
@@ -241,6 +255,6 @@ def testFunc():
         print "That's right, we did it"
 '''
 if __name__ == "__main__":
-    from souper import url_sunglass
+    from souper import url_sunglass, url_multi
 
-    main_algorithm(url_sunglass, sku="TestSub 1")
+    main_algorithm(url_multi, sku="TestSub 1")
