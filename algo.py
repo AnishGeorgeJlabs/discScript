@@ -116,7 +116,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error("Size Chart present with Free size/Standard/Regular")
 
         # ------ CHK 3, Grinding the Model stats ---------------------------------------------------
-        # model_stats = specs.get('model stats')    # not needed as of now
         model_data = product.get('model_data')
         if model_data:
             # --------- CHK 3.1, Size check ---------------
@@ -143,7 +142,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 record_error("Invalid height", str(model_data['height']))
 
         # ------- CHK 4, Extracting data from description ------------------------------------------
-        spec_fields = ['closing', 'neck', 'lining', 'fit', 'heelshape', 'sleeves', 'length', 'style']
         desc_data = {}
         color = {}
         if not product.get('desc'):
@@ -152,10 +150,10 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             # ------ CHK 4.1, Colors --------------------------
             color['description'] = extract_colors(product['desc'])  # Keep this separate
             # ------ CHK 4.2, Rest of the fields --------------
-            for key in spec_fields:
+            for key in v_adv.spec_fields:
                 desc_data[key] = []
                 for i in v_adv.data_map[key]:
-                    if re.search(r'\b%s\b' % (i), product['desc'], re.IGNORECASE):
+                    if re.search(r'\b%s\b' % i, product['desc'], re.IGNORECASE):
                         desc_data[key].append(i)
             desc_data['fit'] = [x.replace("fit", "").replace('-', ' ').strip() for x in desc_data['fit']]
 
@@ -171,23 +169,30 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         # ------ CHK 6, Segment - category specific checks -----------------------------------------
         subcat = product.get("subcat", "")
         if subcat == "watches":
-            spec_colors = clean_para(desc_data.get('strap color', ''))
+            spec_colors = clean_para(specs.get('strap color', ''))
         elif subcat == "sunglasses":
-            frame = desc_data.get('frame color', '')
-            lens = desc_data.get('lens color', '')
+            frame = specs.get('frame color', '')
+            lens = specs.get('lens color', '')
 
             spec_colors = clean_para((frame + " " + lens).strip())
             for key in ['name', 'description']:
                 if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color[key]):
                     record_error("Colors in %s not matching with specs" % key)
         else:
-            spec_colors = desc_data.get('color', '')
+            spec_colors = specs.get('color', '')
 
         if spec_colors == "":
             record_error("No Color")
         elif any(x in spec_colors for x in ['na', 'n/a']):
             record_error("Color N/A error")
 
+        # ------ CHK 7, Material details and miscellaneous -----------------------------------------
+        material_details = v_others.data_map.get(category.lower(), '')
+        is_bag = brick.lower() in v_others.bag_list
+        if (category.lower() == "apparel" or is_bag) and not model_data:
+            record_error("Model Vitals Absent")
+        elif is_bag and model_data and "height" not in model_data:
+            record_error("Incomplete Model Vitals")
 
 
     except Exception, e:

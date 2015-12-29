@@ -10,6 +10,7 @@ from image import read_image  # imgtest=>image
 from colors import colorname
 from var import v_color, v_others, v_adv
 import re as regex
+import var.v_adv
 
 if len(sys.argv) < 3:
     print "Please enter a runcode and console code"
@@ -245,11 +246,11 @@ def get_articles(url, prod_id="", brick="", category="", SKUU="", Brandd="", MRP
                     if m in de:
                         hid.append(m)
                 soid = []
-                for m in v_others.sole_material:
+                for m in var.v_adv.sole_material:
                     if m in de:
                         soid.append(m)
                 umid = []
-                for m in v_others.upper_material:
+                for m in var.v_adv.upper_material:
                     if m in de:
                         umid.append(m)
                 styleid = []

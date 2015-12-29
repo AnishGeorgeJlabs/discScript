@@ -39,13 +39,26 @@ style = ["embellished", "embroidered", "checks", "anarkali", "printed", "cardiga
          "ethnic", "floral", "graphic", "jacquard", "sports bra-non padded", "pleated", "patch work", "unstitched",
          "underwired-padded", "pintucks"]
 
+sole_material = ["tpr", "leather", "rubber", "rubber like (eva)", "pu", "pvc", "phylon", "eva", "resin sheet", "airmax",
+                 "tpu", "cork", "croslite", "crape", "non marking rubber"]
+upper_material = ["genuine leather", "suede leather", "mesh, synthetic leather", "synthetic", "breathable nylon mesh",
+                  "non leather", "nylon mesh", "mesh", "breathable mesh", "rubber like (eva)",
+                  "air mesh", "canvas", "patent leather", "genuine leather/canvas", "polyester mesh", "nubuck leather",
+                  "mesh suede leather", "welded overlays mesh", "rubber", "satin", "synthetic mesh",
+                  "velvet", "suiede mesh", "canvas/genuine leather", "croslite", "eva", "leather", "satin fabric",
+                  "synthetic suede leather", "60% genuine leather, 40% textile", "engineered mesh",
+                  "jute", "micro suede/mesh"]
+
 data_map = {
     "closing": closing,
     "neck": neck,
     "lining": lining,
     "fit": fit,
-    "heelshape": heelshape,
+    "heel shape": heelshape,
+    "sole material": sole_material,
+    "upper material": upper_material,
     "sleeves": sleeves,
     "length": length,
     "style": style
 }
+spec_fields = data_map.keys()

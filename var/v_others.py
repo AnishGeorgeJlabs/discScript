@@ -98,17 +98,21 @@ no_vitals = ["belt", "boxers", "briefs", "caps", "combo", "cufflinks", "handkerc
              "socks", "ties", "trunks", "vests", "wallet", "wristbands", "dupattas", "shawls", "shrugs", "stoles",
              "pocket square"]
 
-upper_material = ["genuine leather", "suede leather", "mesh, synthetic leather", "synthetic", "breathable nylon mesh",
-                  "non leather", "nylon mesh", "mesh", "breathable mesh", "rubber like (eva)",
-                  "air mesh", "canvas", "patent leather", "genuine leather/canvas", "polyester mesh", "nubuck leather",
-                  "mesh suede leather", "welded overlays mesh", "rubber", "satin", "synthetic mesh",
-                  "velvet", "suiede mesh", "canvas/genuine leather", "croslite", "eva", "leather", "satin fabric",
-                  "synthetic suede leather", "60% genuine leather, 40% textile", "engineered mesh",
-                  "jute", "micro suede/mesh"]
 footwear_mat = ["plastic moulded footwear", "cotton", "pvc", "non leather", "leather", "na"]
-sole_material = ["tpr", "leather", "rubber", "rubber like (eva)", "pu", "pvc", "phylon", "eva", "resin sheet", "airmax",
-                 "tpu", "cork", "croslite", "crape", "non marking rubber"]
 
 bag_list = ["sling bag", "backpack", "duffel bags", "bags", "laptop bag", "laptop backpack",
             "messenger bags", "shopping bag", "school bag", "travelling bag", "sports bag",
             "laptop briefcase", "multiutility bag"]
+
+# map of categories against the material details
+data_map = {
+    "acc": acc,
+    "jewellry": jewellery,
+    "apparel": apparels,
+    "home": home,
+    "footwear": footwear_mat,
+    "beauty": beauty,
+    "fragrances": beauty,
+    "toys": toys,
+    "actsprts": actsprts
+}
