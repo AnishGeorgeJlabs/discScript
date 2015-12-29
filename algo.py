@@ -22,8 +22,8 @@ def split_para(p):
     :return: A list of words
     """
     return [
-        word.strip(" .")
-        for word in p.replace(',', ' ').split(' ')
+        word
+        for word in re.split('\W+', p)
         if word
         ]
 
@@ -185,7 +185,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error("Color N/A error")
 
         # ------ CHK 6.1, Assorted and multi --------------------------------------------------------
-        def check_assorted_multi(a,b):
+        def check_assorted_multi(a, b):
             if a in product['name']:
                 if b in spec_colors:
                     record_error("%s is mentioned in color" % b.title())
@@ -202,6 +202,10 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         for key in ['name', 'description']:
             if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color.get(key, [])):
                 record_error("Colors in %s not matching with specs" % key)
+
+        # ------ CHK 6.3, check if the color is available in the list ------------------------------
+        if any(c not in v_color.complete for c in spec_colors.split(',')):
+            record_error("Color not found in list")
 
         # ------ CHK 7, random stuff ---------------------------------------------------------------
         is_bag = brick.lower() in v_others.bag_list
@@ -227,6 +231,23 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 if c_material not in desc_materials:
                     record_error("Mismatch in material",
                                  "specs: %s, description: %s" % (str(material), str(desc_materials)))
+
+
+        # ------ CHK 9, Package contents -----------------------------------------------------------
+        numeric_set = ['set of', 'pack of', 'combo of']
+        non_numeric_set = ['suit set']
+        if any(x in product['desc'] for x in numeric_set + non_numeric_set) and 'package contents' not in specs:
+            record_error("Package contents absent")
+
+        for x in numeric_set:
+            if x in product['desc']:
+                try:
+                    contents = int(split_para(product['desc'].split(x)[1])[0])
+                    if str(contents) not in specs.get("package contents", ""):
+                        raise Exception("not available in specs")
+                except:
+                    record_error("Error in Package Contents")
+
 
 
 
@@ -258,6 +279,8 @@ def testFunc():
         print "That's right, we did it"
 '''
 if __name__ == "__main__":
-    from souper import url_sunglass, url_multi
+    from souper import url_multi
+    url_package_1 = "http://www.jabong.com/jaipur-kurti-Multi-Colored-Printed-Cotton-Salwar-Kameez-Dupatta-1790943.html?pos=2"
+    url_package_2 = "http://www.jabong.com/sir-michele-Sir-Michele-Ladies-Designer-Anklet-Socks5-Pairs-1851601.html?pos=1"
 
-    main_algorithm(url_multi, sku="TestSub 1")
+    main_algorithm(url_package_2, sku="TestSub 1")

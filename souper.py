@@ -10,7 +10,7 @@ url_multi = "http://www.jabong.com/jaipur-kurti-Multi-Colored-Printed-Cotton-Sal
 
 def get_complete_string(soup):
     return reduce(lambda a,b: a + b,
-                  [x.string.strip() for x in soup.contents if x and x.string],
+                  [x.string.strip().lower() for x in soup.contents if x and x.string],
                   "")
 
 def get_data(url):
