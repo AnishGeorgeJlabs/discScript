@@ -50,7 +50,7 @@ def get_data(url):
 
     # Get the item's category hierarchy from breadcrumbs
     bread = [
-        x.string.strip() for x in
+        x.string.strip().lower() for x in
         soup.find("ol", class_="breadcrumb").find_all("li")
     ]
     res.update({
