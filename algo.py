@@ -27,6 +27,27 @@ def split_para(p):
         if word
         ]
 
+def find_nearby(word, para):
+    """
+    Finds the nearby words of a any given word in a para, the immediate left and right only
+    :param word:
+    :param para:
+    :return:
+    """
+    def helper(subpara):
+        sp = re.split(word, subpara, maxsplit=1)
+        if len(sp) == 1:
+            return []
+        else:
+            splits = [split_para(x) for x in sp]
+            s = set()
+            if len(splits[0]):
+                s.add(splits[0][-1])
+            if len(splits[-1]):
+                s.add(splits[-1][0])
+            return list(s) + helper(sp[1])
+    return helper(para)
+
 
 def clean_para(p):
     freg = re.compile(r'\W+')
@@ -155,7 +176,8 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 desc_data[key] = []
                 for i in v_adv.data_map[key]:
                     if re.search(r'\b%s\b' % i, product['desc'], re.IGNORECASE):
-                        desc_data[key].append(i)
+                        if key not in v_adv.tricky_fields or key in find_nearby(i, product['desc']):
+                            desc_data[key].append(i)
             desc_data['fit'] = [x.replace("fit", "").replace('-', ' ').strip() for x in desc_data['fit']]
 
         color['name'] = extract_colors(product['name'].lower())
@@ -231,7 +253,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 if c_material not in desc_materials:
                     record_error("Mismatch in material",
                                  "specs: %s, description: %s" % (str(material), str(desc_materials)))
-
 
         # ------ CHK 9, Package contents -----------------------------------------------------------
         numeric_set = ['set of', 'pack of', 'combo of']

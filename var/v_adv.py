@@ -62,3 +62,5 @@ data_map = {
     "style": style
 }
 spec_fields = data_map.keys()
+
+tricky_fields = ['lining']
