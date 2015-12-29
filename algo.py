@@ -167,7 +167,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                     record_error("%s details mismatch in description" % k,
                                  "desc: %s, specs: %s" % (str(v), str(product['specs'].get(k, ''))))
 
-        # ------ CHK 6, Segment - category specific checks -----------------------------------------
+        # ------ CHK 6, Segment - category specific checks, for color ------------------------------
         subcat = product.get("subcat", "")
         if subcat == "watches":
             spec_colors = clean_para(specs.get('strap color', ''))
@@ -176,9 +176,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             lens = specs.get('lens color', '')
 
             spec_colors = clean_para((frame + " " + lens).strip())
-            for key in ['name', 'description']:
-                if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color[key]):
-                    record_error("Colors in %s not matching with specs" % key)
         else:
             spec_colors = specs.get('color', '')
 
@@ -186,6 +183,25 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error("No Color")
         elif any(x in spec_colors for x in ['na', 'n/a']):
             record_error("Color N/A error")
+
+        # ------ CHK 6.1, Assorted and multi --------------------------------------------------------
+        def check_assorted_multi(a,b):
+            if a in product['name']:
+                if b in spec_colors:
+                    record_error("%s is mentioned in color" % b.title())
+                elif a not in spec_colors and len(spec_colors):
+                    record_error("%s is missing in color" % a.title())
+                return True
+            else:
+                return False
+
+        if check_assorted_multi("assorted", "multi") and check_assorted_multi("multi", "assorted"):
+            record_error("Both of assorted and multi are mentioned in name")
+
+        # ------ CHK 6.2, Match colors against name and description --------------------------------
+        for key in ['name', 'description']:
+            if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color.get(key, [])):
+                record_error("Colors in %s not matching with specs" % key)
 
         # ------ CHK 7, random stuff ---------------------------------------------------------------
         is_bag = brick.lower() in v_others.bag_list
@@ -212,19 +228,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                     record_error("Mismatch in material",
                                  "specs: %s, description: %s" % (str(material), str(desc_materials)))
 
-        # ------ CHK 9, Assorted and multi ---------------------------------------------------------
-        def check_assorted_multi(a,b):
-            if a in product['name']:
-                if b in spec_colors:
-                    record_error("%s is mentioned in color" % b.title())
-                elif a not in spec_colors and len(spec_colors):
-                    record_error("%s is missing in color" % a.title())
-                return True
-            else:
-                return False
-
-        if check_assorted_multi("assorted", "multi") and check_assorted_multi("multi", "assorted"):
-            record_error("Both of assorted and multi are mentioned in name")
 
 
 
