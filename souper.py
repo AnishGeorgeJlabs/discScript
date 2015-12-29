@@ -5,6 +5,12 @@ import requests
 url1 = "http://www.jabong.com/phosphorus-Mandarin-collar-oxford-casual-shirt-1570940.html?pos=1"
 url2 = "http://www.jabong.com/park-avenue-Blue-Striped-Slim-Fit-Formal-Shirt-1623073.html?pos=2"
 url3 = "http://www.jabong.com/phosphorus-Andrew-Hill-Formal-Collection-1489771.html?pos=4"
+url_sunglass = "http://www.jabong.com/park-avenue-Brown-Black-Aviator-Sunglasses-1534465.html?pos=1"
+
+def get_complete_string(soup):
+    return reduce(lambda a,b: a + b,
+                  [x.string.strip() for x in soup.contents if x and x.string],
+                  "")
 
 def get_data(url):
     """ Get the Product data by scrapping off page
@@ -17,7 +23,7 @@ def get_data(url):
     def find_by_class(c, tag="span"):
         obj = soup.find(tag, class_=c)
         if obj:
-            return obj.string.strip()
+            return get_complete_string(obj)
         else:
             return None
 
@@ -37,7 +43,7 @@ def get_data(url):
     for item in spec_list:
         if 'authorized-brand' in item.get('class', []):
             continue
-        specs[item.label.string.strip().lower()] = item.span.string.strip().lower()
+        specs[get_complete_string(item.label).strip().lower()] = get_complete_string(item.span).strip().lower()
     res['specs'] = specs
     if 'model stats' in res['specs']:
         res['model_data'] = extract_model_stats(res['specs']['model stats'])

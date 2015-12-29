@@ -1,7 +1,7 @@
 import csv
+import re
 
 import pymysql
-import re
 
 from var import v_color, v_others, v_adv
 from souper import get_data
@@ -28,6 +28,9 @@ def split_para(p):
         if word
         ]
 
+def clean_para(p):
+    freg = re.compile(r'\W+')
+    return freg.sub(" ", p)
 
 def extract_colors(desc):
     # step 1, find any of the colors directly in desc
@@ -48,7 +51,7 @@ def extract_colors(desc):
         if "with" in v and any(key in v for key in ['team', 'pair', 'club', 'wear', 'style', 'combine']):
             f_color_dic.pop(k)
 
-    return [c.replace(" ", "-") for c in f_color_dic.keys()]
+    return [c.replace("-", " ") for c in f_color_dic.keys()]
 
 
 '''
@@ -73,6 +76,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
     :param item_type:
     :return:
     """
+    errors = []  # the list of discrepancies we recording
     try:
         # DB stuff
         if use_db:
@@ -88,8 +92,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 writer = csv.writer(cfile)
                 writer.writerow([url])
                 return
-
-        errors = []  # the list of discrepancies we recording
 
         def record_error(error, additional=""):
             errors.append(error)
@@ -143,33 +145,54 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         # ------- CHK 4, Extracting data from description ------------------------------------------
         spec_fields = ['closing', 'neck', 'lining', 'fit', 'heelshape', 'sleeves', 'length', 'style']
         desc_data = {}
+        color = {}
         if not product.get('desc'):
             record_error("Discription Not Present")
         else:
             # ------ CHK 4.1, Colors --------------------------
-            desc_data["color"] = extract_colors(product['desc'])
+            color['description'] = extract_colors(product['desc'])  # Keep this separate
             # ------ CHK 4.2, Rest of the fields --------------
             for key in spec_fields:
                 desc_data[key] = []
                 for i in v_adv.data_map[key]:
-                    if re.search(r'\b%s\b'%(i), product['desc'], re.IGNORECASE):
+                    if re.search(r'\b%s\b' % (i), product['desc'], re.IGNORECASE):
                         desc_data[key].append(i)
             desc_data['fit'] = [x.replace("fit", "").replace('-', ' ').strip() for x in desc_data['fit']]
 
-        color_in_name = extract_colors(product['name'].lower())
+        color['name'] = extract_colors(product['name'].lower())
 
         # ------ CHK 5, Basic Checks of description against specs ----------------------------------
         for k, v in desc_data.items():
             for item in v:
                 if item not in product['specs'].get(k, ""):
-                    record_error("%s details mismatch in description" % k, "desc: %s, specs: %s" % (str(v), str(product['specs'].get(k, ''))))
+                    record_error("%s details mismatch in description" % k,
+                                 "desc: %s, specs: %s" % (str(v), str(product['specs'].get(k, ''))))
 
         # ------ CHK 6, Segment - category specific checks -----------------------------------------
+        subcat = product.get("subcat", "")
+        if subcat == "watches":
+            spec_colors = clean_para(desc_data.get('strap color', ''))
+        elif subcat == "sunglasses":
+            frame = desc_data.get('frame color', '')
+            lens = desc_data.get('lens color', '')
+
+            spec_colors = clean_para((frame + " " + lens).strip())
+            for key in ['name', 'description']:
+                if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color[key]):
+                    record_error("Colors in %s not matching with specs" % key)
+        else:
+            spec_colors = desc_data.get('color', '')
+
+        if spec_colors == "":
+            record_error("No Color")
+        elif any(x in spec_colors for x in ['na', 'n/a']):
+            record_error("Color N/A error")
 
 
 
-    except:
-        pass
+    except Exception, e:
+        raise
+        print "Received exception ", e
     finally:
         if use_db:
             if db:
@@ -191,6 +214,6 @@ def testFunc():
         print "That's right, we did it"
 '''
 if __name__ == "__main__":
-    from souper import url1, url2, url3
+    from souper import url1, url_sunglass
 
-    main_algorithm(url1, sku="TestSub 1")
+    main_algorithm(url_sunglass, sku="TestSub 1")
