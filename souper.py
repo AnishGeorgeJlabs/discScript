@@ -31,7 +31,8 @@ def get_data(url):
     res = {
         "name": find_by_class("product-title").lower(),
         "brand": find_by_class("brand"),
-        "has_size_chart": bool(soup.find(id="size-block").find("a", class_="help dialogify")),     # todo, recheck
+        "has_size_chart": bool(soup.find(id="size-block").find("a", class_="help dialogify")),
+        "has_video": bool(soup.find("div", class_='b-prod-video')),
         "desc": find_by_class("prod-disc", "h2"),
         "n_images": len(soup.find("div", class_="product-carousel").find_all("img"))
     }
