@@ -274,8 +274,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
 
 
 
-
-
+        return errors
     except Exception, e:
         raise
         print "Received exception ", e
@@ -287,6 +286,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 dba.close()
         print "Done, errors: "
         print errors
+        return errors
 
 
 '''

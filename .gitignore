@@ -2,3 +2,5 @@ env
 .idea
 discrepancy script.iml
 *.pyc
+database
+*.csv
