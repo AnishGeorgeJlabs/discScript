@@ -4,7 +4,7 @@ import csv
 from ftplib import FTP
 import pymysql
 
-file_name = 'database/cor_urls.csv'
+file_name = 'database/sample_urls.csv'
 
 cnx = pymysql.connect(
     host='localhost',
@@ -32,7 +32,7 @@ with open(file_name, 'r') as cfile:
                 cursor.execute(stm, (row[0], error))
             cnx.commit()
 
-
+#'''
 with open('result.csv', 'w') as wfile:
     writer = csv.writer(wfile)
     cursor.execute("SELECT errors.sku, category, class, brick, url, error FROM errors INNER JOIN urls on urls.sku = errors.sku ")
@@ -46,3 +46,4 @@ with open('result.csv', 'r') as fl:
     ftp.storlines('STOR descrepancy_result.csv', fl)
 
 ftp.close()
+#'''
