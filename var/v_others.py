@@ -1,24 +1,24 @@
-height_range = ['5\'1\"', '5\'2\"', '5\'3\"', '5\'4\"', '5\'5\"', '5\'6\"', '5\'7\"', '5\'8\"', '5\'9\"', '5\'10',
-                '5\'11', '6\'0\"', '6\'1\"', '6\'2\"', '6\'3\"', '6\'4\"', '6\'5\"', '6\'6\"']
+height_range = {'5\'1\"', '5\'2\"', '5\'3\"', '5\'4\"', '5\'5\"', '5\'6\"', '5\'7\"', '5\'8\"', '5\'9\"', '5\'10',
+                '5\'11', '6\'0\"', '6\'1\"', '6\'2\"', '6\'3\"', '6\'4\"', '6\'5\"', '6\'6\"'}
 
-dumb_sizes = ['free', 'standard', 'regular']
+dumb_sizes = {'free', 'standard', 'regular'}
 
-shadecard_bricks = ["eye pencil", "eye shadow", "lip liner", "eye liner", "lipstick", "lips gloss", "make-up base",
+shadecard_bricks = {"eye pencil", "eye shadow", "lip liner", "eye liner", "lipstick", "lips gloss", "make-up base",
                     "nail enamel", "mascara", "compact powder", "blusher",
                     "lip balm", "lip care", "loose powder", "concealer & corrector", "face highlighter", "highlighter",
-                    "nail art", "kajal", "nail top & base coat", "eye palette"]
-beauty = ["strech denim"]  # beauty and fragnances
-toys = ["100% linen"]
-actsprts = ["polyester", "polyester spandex", "poly cotton"]
-jewellery = ["bones", "pu", "metal", "leather/brass", "92.5 silver", "pewter", "leather", "tungsten", "thread",
+                    "nail art", "kajal", "nail top & base coat", "eye palette"}
+beauty = {"strech denim"}  # beauty and fragnances
+toys = {"100% linen"}
+actsprts = {"polyester", "polyester spandex", "poly cotton"}
+jewellery = {"bones", "pu", "metal", "leather/brass", "92.5 silver", "pewter", "leather", "tungsten", "thread",
              "steel", "crystal", "sterling silver", "copper", "brass & leather", "swarovski elements",
              "semi-precious stones", "copper alloy", "resin", "wooden", "titanium", "metal/leather", "brass & beads",
              "69%steel, 40%acrylic", "alloy & acrylic", "wood", "beads", "100%zinc", "brass metal", "alloy", "acrylic",
              "brass", "ceramic", "na", "polyester", "stainless steel", "14 karat gold", "german silver", "cz", "stone",
              "glass beads", "fabric", "shell", "lace", "silver", "18 karat gold", "plastic", "clay",
              "316l stainless steel", "pearl", "80%metal, 20%glass", "92.5 sterling silver", "leather/beads", "nylon",
-             "faux leather", "diamond", "bronze", "silver+alloy", "gold"]
-home = ["micro fibre", "iron", "metal", "cotton silk", "70%polyester 30%cotton", "poly velvet",
+             "faux leather", "diamond", "bronze", "silver+alloy", "gold"}
+home = {"micro fibre", "iron", "metal", "cotton silk", "70%polyester 30%cotton", "poly velvet",
         "65% polyester 35% cotton", "terry", "100% polyester", "poly dupion", "micro fabric", "cotton vicsose",
         "polyster", "polysilk", "polyester wool", "memory foam", "polycotton", "polypropylene", "taffeta",
         "60%cotton 40%polyester", "cotton blend with polyfill", "polyester viscose", "100% cotton", "soyabean",
@@ -28,8 +28,8 @@ home = ["micro fibre", "iron", "metal", "cotton silk", "70%polyester 30%cotton",
         "100% mercerized cotton", "100% cotton with polyfill", "rubber", "pvc", "velvet", "80%cotton 20%polyester",
         "tencel", "silk", "jute", "microfibre filling", "rayon", "plastic", "60% viscose 40% polyester", "leatherette",
         "cotton", "outer cotton inner polyester", "nylon", "viscose", "cotton satin", "70%cotton 30%polyester",
-        "60%polyester 40%cotton"]
-acc = ["900d polyester x 600d polyester", "metal", "acetate blend", "sheet", "leather", "synthetic", "polyester fabric",
+        "60%polyester 40%cotton"}
+acc = {"900d polyester x 600d polyester", "metal", "acetate blend", "sheet", "leather", "synthetic", "polyester fabric",
        "1680d polyester", "neoprene", "denim", "polyurethane", "cloth", "tough polyester fabric", "resin", "tetron",
        "canvas/leather", "600d polyester", "alloy & acrylic", "polyamide", "acrylic", "900d polyester", "flex",
        "cotton canvas", "dupion silk", "presspro technology", "jute", "pearl", "leatherette", "viscose", "420d nylon",
@@ -44,8 +44,8 @@ acc = ["900d polyester x 600d polyester", "metal", "acetate blend", "sheet", "le
        "silicon", "poly/shimmer", "steel", "tr-90", "others", "polypropylene", "artificial leather", "ripstop fabric",
        "canvas & leather", "titanium", "suede", "wood", "non leather", "ceramic", "vegan cow leather",
        "630d polyester + 420d dobby", "dobby nylon", "webbing", "tough polypropylene", "rubber", "silk", "pu/canvas",
-       "nylon", "satin"]
-apparels = ["metal", "100% acrylic", "viscose jersey", "acetate blend", "lyocell", "cotton voile", "leather",
+       "nylon", "satin"}
+apparels = {"metal", "100% acrylic", "viscose jersey", "acetate blend", "lyocell", "cotton voile", "leather",
             "cotton poly", "polyamide spandex(stretchable)", "synthetic", "tussar silk", "poly dupion", "chambrey",
             "nylon & cotton", "polyster", "cotton linen", "denim", "nylon spandex(stretchable)", "100% viscose",
             "ramie", "nylon spandex", "polyurethane", "velour", "95%terelene 5%spandex(stretchable)", "pique",
@@ -93,16 +93,16 @@ apparels = ["metal", "100% acrylic", "viscose jersey", "acetate blend", "lyocell
             "acrylic blend", "silk", "tencel", "60% polyester, 40% cotton", "rayon",
             "80%viscose 13%nylon 7%spandex(stretchable)", "polyamide blend", "rayon polyester", "viscose jersy",
             "flannel", "wool cotton spandex(stretchable)", "modal", "nylon", "cotton satin", "chandelier lace",
-            "terry rayon", "satin"]
-no_vitals = ["belt", "boxers", "briefs", "caps", "combo", "cufflinks", "handkerchief", "hats", "mufflers", "scarves",
+            "terry rayon", "satin"}
+no_vitals = {"belt", "boxers", "briefs", "caps", "combo", "cufflinks", "handkerchief", "hats", "mufflers", "scarves",
              "socks", "ties", "trunks", "vests", "wallet", "wristbands", "dupattas", "shawls", "shrugs", "stoles",
-             "pocket square"]
+             "pocket square"}
 
-footwear_mat = ["plastic moulded footwear", "cotton", "pvc", "non leather", "leather", "na"]
+footwear_mat = {"plastic moulded footwear", "cotton", "pvc", "non leather", "leather", "na"}
 
-bag_list = ["sling bag", "backpack", "duffel bags", "bags", "laptop bag", "laptop backpack",
+bag_list = {"sling bag", "backpack", "duffel bags", "bags", "laptop bag", "laptop backpack",
             "messenger bags", "shopping bag", "school bag", "travelling bag", "sports bag",
-            "laptop briefcase", "multiutility bag"]
+            "laptop briefcase", "multiutility bag"}
 
 # map of categories against the material details
 data_map = {

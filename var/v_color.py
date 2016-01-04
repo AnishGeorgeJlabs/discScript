@@ -1,4 +1,4 @@
-all = ["white", "brown", "aqua-blue", "metal", "golden", "rust", "steel-grey", "coffee", "milange", "light-grey",
+all = {"white", "brown", "aqua-blue", "metal", "golden", "rust", "steel-grey", "coffee", "milange", "light-grey",
               "assorted", "off-white", "tan", "green", "cream", "transparent", "wine", "copper", "yellow", "black",
               "mauve", "cobalt-blue", "camel", "dark-grey", "turquoise", "violet-indigo", "brick-red", "ash", "orange",
               "camel-shade", "navy-blue", "fuchsia", "grey", "emerald", "lemon", "lilac", "red", "nude",
@@ -6,26 +6,26 @@ all = ["white", "brown", "aqua-blue", "metal", "golden", "rust", "steel-grey", "
               "light-blue", "charcoal-grey", "sand", "maroon", "antique", "khaki", "champagne", "mustard-yellow",
               "lavender", "purple", "antique-silver", "aqua", "grey-milange", "silver", "pearl", "pink", "beige",
               "apricot", "magenta", "blue", "ice-blue", "bronze", "firozi", "citrine", "multi"
-              ]
+              }
 
 '''
-complete = []
+complete = {}
 for color in all:
     complete.append(color)
     if '-' in color:
         complete.append(color.replace("-", ' '))
 '''
-spaced_colors = [x.replace('-', ' ') for x in filter(lambda c: "-" in c, all)]
+spaced_colors = {x.replace('-', ' ') for x in filter(lambda c: "-" in c, all)}
 complete = spaced_colors + all
 
-grey = ["grey", "dark-grey", "light-grey", "steel-grey", "charcoal-grey"]
-milange = ["grey-milange", "milange"]
-red = ["brick-red", "red"]
-silver = ["silver", "antique-silver"]
-blue = ["navy-blue", "aqua-blue", "cobalt-blue", "light-blue", "blue", "ice-blue"]
-white = ["white", "off-white"]
-yellow = ["mustard-yellow", "yellow"]
-antique = ["antique", "antique-gold"]
+grey = {"grey", "dark-grey", "light-grey", "steel-grey", "charcoal-grey"}
+milange = {"grey-milange", "milange"}
+red = {"brick-red", "red"}
+silver = {"silver", "antique-silver"}
+blue = {"navy-blue", "aqua-blue", "cobalt-blue", "light-blue", "blue", "ice-blue"}
+white = {"white", "off-white"}
+yellow = {"mustard-yellow", "yellow"}
+antique = {"antique", "antique-gold"}
 
 co_map = {
     "blue": blue,
