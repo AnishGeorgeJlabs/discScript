@@ -154,7 +154,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             if "hips" in model_data:
                 record_error("Hips mentioned in Model stats")
 
-            for key in ["chest", "waist", "bust", "hip", "hips"]:
+            for key in ["chest", "waist", "bust", "hip", "hips"]:       # have to work on this to get uniform model
                 if key in model_data:
                     val = model_data[key][:2]
                     if not unicode(val).isnumeric():
