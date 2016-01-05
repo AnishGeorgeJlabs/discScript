@@ -1,8 +1,9 @@
 import csv
-
 import re
+
 import pymysql
-from var import v_color, v_others, v_adv
+
+from var import v_color, v_others, v_adv, db_fix
 from souper import get_data
 
 use_db = False
@@ -27,6 +28,7 @@ def split_para(p):
         if word
         ]
 
+
 def find_nearby(word, para):
     """
     Finds the nearby words of a any given word in a para, the immediate left and right only
@@ -34,6 +36,7 @@ def find_nearby(word, para):
     :param para:
     :return:
     """
+
     def helper(subpara):
         sp = re.split(word, subpara, maxsplit=1)
         if len(sp) == 1:
@@ -46,6 +49,7 @@ def find_nearby(word, para):
             if len(splits[-1]):
                 s.add(splits[-1][0])
             return list(s) + helper(sp[1])
+
     return helper(para)
 
 
@@ -115,9 +119,12 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 writer.writerow([url])
                 return
 
-        def record_error(error, additional=""):
-            errors.append(error)
-            print "> %s: %s -- %s" % (sku, error, additional)
+        def record_error(error_code, help_text="", details=None):
+            errors.append({
+                "code": int(error_code),
+                "details": details
+            })
+            print "> %s: [%i] %s -- %s" % (sku, error_code, help_text, details)
 
         # ------ CHK 1, number of pics ----------------
         if use_db:
@@ -127,15 +134,15 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             #     n_bricks.append(x)
             if n_bricks[0][1] < product[
                 'n_images']:  # checks the no. of pics with the compliance db.todo, check the index
-                record_error("Error in number of images",
-                             "site: %i, actual: %s" % (product['n_images'], str(n_bricks[0][1])))
+                record_error(33, help_text="Error in number of images",
+                               details="shown: %i, required: %s" % (product['n_images'], str(n_bricks[0][1])))
 
         # ------ CHK 2, Size chart and selections ------
         if len(product['sizes']) > 1 and not product['has_size_chart']:
             record_error("Size Chart Absent", "%i sizes available" % len(product['sizes']))
         elif len(product['sizes']) == 1 and product['sizes'][0] in v_others.dumb_sizes and \
                 product['has_size_chart']:
-            record_error("Size Chart present with Free size/Standard/Regular")
+            record_error(35, help_text="Size Chart present with Free size/Standard/Regular")
 
         # ------ CHK 3, Grinding the Model stats ---------------------------------------------------
         model_data = product.get('model_data')
@@ -145,29 +152,32 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 desc_sizes = model_data['size']
                 if all(x not in product['sizes'] for x in desc_sizes):
                     if len(product['sizes']) > 0:
-                        record_error("Size worn by model not available for selection",
-                                     "%s, %s" % (str(desc_sizes[0]), str(desc_sizes[-1])))
+                        record_error(36, help_text="Size worn by model not available for selection",
+                                       details="model has unavailable size of either - %s - or - %s -" % (
+                                           str(desc_sizes[0]), str(desc_sizes[-1])))
                     elif all(x not in v_others.dumb_sizes for x in desc_sizes):
-                        record_error("Size worn by model is unknown")
+                        record_error(37, help_text="Size worn by model is unknown")
 
             # --------- CHK 3.2, Body measurements --------
             if "hips" in model_data:
-                record_error("Hips mentioned in Model stats")
+                record_error(38, help_text="Hips mentioned in Model stats")
 
-            for key in ["chest", "waist", "bust", "hip", "hips"]:       # have to work on this to get uniform model
+            for key in ["chest", "waist", "bust", "hip", "hips"]:  # have to work on this to get uniform model
                 if key in model_data:
                     val = model_data[key][:2]
                     if not unicode(val).isnumeric():
-                        record_error("Invalid %s size" % key, str(val))
+                        record_error(db_fix.vital_errors_map[key], help_text="Invalid %s size" % key,
+                                       details='Invalid size: %s' % str(val))
 
             if "height" in model_data and model_data['height'] not in v_others.height_range:
-                record_error("Invalid height", str(model_data['height']))
+                record_error(db_fix.vital_errors_map['height'], help_text="Invalid height",
+                               details='Invalid size: %s' % str(model_data['height']))
 
         # ------- CHK 4, Extracting data from description ------------------------------------------
         desc_data = {}
         color = {}
         if not product.get('desc'):
-            record_error("Discription Not Present")
+            record_error(44, help_text="Discription Not Present")
         else:
             # ------ CHK 4.1, Colors --------------------------
             color['description'] = extract_colors(product['desc'])  # Keep this separate
@@ -186,8 +196,9 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         for k, v in desc_data.items():
             for item in v:
                 if item not in product['specs'].get(k, ""):
-                    record_error("%s details mismatch in description" % k,
-                                 "desc: %s, specs: %s" % (str(v), str(product['specs'].get(k, ''))))
+                    record_error(45, help_text="%s details mismatch in description" % k,
+                                   details="for section: %s, description gives %s while specs give %s" % (
+                                       k, str(v), str(product['specs'].get(k, ''))))
 
         # ------ CHK 6, Segment - category specific checks, for color ------------------------------
         subcat = product.get("subcat", "")
@@ -202,39 +213,40 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             spec_colors = specs.get('color', '')
 
         if spec_colors == "":
-            record_error("No Color")
+            record_error(46, help_text="No Color")
         elif any(x in spec_colors for x in ['na', 'n/a']):
-            record_error("Color N/A error")
+            record_error(47, help_text="Color N/A error")
 
         # ------ CHK 6.1, Assorted and multi --------------------------------------------------------
         def check_assorted_multi(a, b):
             if a in product['name']:
                 if b in spec_colors:
-                    record_error("%s is mentioned in color" % b.title())
+                    record_error(db_fix.assorted_multi_map[b], help_text="%s is mentioned in color" % b.title())
                 elif a not in spec_colors and len(spec_colors):
-                    record_error("%s is missing in color" % a.title())
+                    record_error(db_fix.assorted_multi_miss_map[a], help_text="%s is missing in color" % a.title())
                 return True
             else:
                 return False
 
         if check_assorted_multi("assorted", "multi") and check_assorted_multi("multi", "assorted"):
-            record_error("Both of assorted and multi are mentioned in name")
+            record_error(50, help_text="Both of assorted and multi are mentioned in name")
 
         # ------ CHK 6.2, Match colors against name and description --------------------------------
         for key in ['name', 'description']:
             if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color.get(key, [])):
-                record_error("Colors in %s not matching with specs" % key)
+                record_error(db_fix.color_match_specs_map[key],
+                               help_text="Colors in %s not matching with specs" % key)
 
         # ------ CHK 6.3, check if the color is available in the list ------------------------------
         if any(c not in v_color.complete for c in spec_colors.split(',')):
-            record_error("Color not found in list")
+            record_error(53, help_text="Color not found in list")
 
         # ------ CHK 7, random stuff ---------------------------------------------------------------
         is_bag = brick.lower() in v_others.bag_list
         if (category.lower() == "apparel" or is_bag) and not model_data:
-            record_error("Model Vitals Absent")
+            record_error(54, help_text="Model Vitals Absent")
         elif is_bag and model_data and "height" not in model_data:
-            record_error("Incomplete Model Vitals")
+            record_error(55, help_text="Incomplete Model Vitals")
 
         # ------ CHK 8, Material check -------------------------------------------------------------
         material = specs.get("material")  # ASSUMPTION, gives a single material
@@ -251,14 +263,15 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             if len(desc_materials):
                 c_material = pat.sub('', material)
                 if c_material not in desc_materials:
-                    record_error("Mismatch in material",
-                                 "specs: %s, description: %s" % (str(material), str(desc_materials)))
+                    record_error(56, help_text="Mismatch in material",
+                                   details="material in specs: %s and in description: %s" % (
+                                   str(material), str(desc_materials)))
 
         # ------ CHK 9, Package contents -----------------------------------------------------------
         numeric_set = ['set of', 'pack of', 'combo of']
         non_numeric_set = ['suit set']
         if any(x in product['desc'] for x in numeric_set + non_numeric_set) and 'package contents' not in specs:
-            record_error("Package contents absent")
+            record_error(57, help_text="Package contents absent")
 
         for x in numeric_set:
             if x in product['desc']:
@@ -267,12 +280,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                     if str(contents) not in specs.get("package contents", ""):
                         raise Exception("not available in specs")
                 except:
-                    record_error("Error in Package Contents")
-
-
-
-
-
+                    record_error(58, help_text="Error in Package Contents")
 
         return errors
     except Exception, e:
@@ -300,7 +308,6 @@ def testFunc():
         print "That's right, we did it"
 '''
 if __name__ == "__main__":
-    from souper import url_multi
     url_package_1 = "http://www.jabong.com/jaipur-kurti-Multi-Colored-Printed-Cotton-Salwar-Kameez-Dupatta-1790943.html?pos=2"
     url_package_2 = "http://www.jabong.com/sir-michele-Sir-Michele-Ladies-Designer-Anklet-Socks5-Pairs-1851601.html?pos=1"
 
