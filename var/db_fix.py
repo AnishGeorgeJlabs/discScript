@@ -24,4 +24,5 @@ color_match_specs_map = {
 
 db = cnx.cursor()
 db.execute("SELECT * from brick")
-brick_image_map = dict(db)
+brick_image_map = dict((k[0].lower, k) for k in db)
+#print brick_image_map

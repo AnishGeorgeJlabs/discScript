@@ -115,14 +115,18 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 "code": int(error_code),
                 "details": details
             })
-            print "> %s: [%i] %s -- %s" % (sku, error_code, help_text, details)
+            #print "> %s: [%i] %s -- %s" % (sku, error_code, help_text, details)
 
         # ------ CHK 1, number of pics ----------------
-        if db_fix.brick_image_map[brick] < product['n_images']:
-            record_error(33, help_text="Error in number of images",
-                         details="shown: %i, required: %s" % (product['n_images'], str(db_fix.brick_image_map[brick])))
+        #print "check 1"
+        r_images = db_fix.brick_image_map.get(brick)
+        if r_images and r_images < product['n_images']:
+            record_error(33,
+                         help_text="Error in number of images",
+                         details="brick: %s, shown: %i, required: %i" % (brick, product['n_images'], db_fix.brick_image_map.get(brick,0)))
 
         # ------ CHK 2, Size chart and selections ------
+        #print "check 2"
         if len(product['sizes']) > 1 and not product['has_size_chart']:
             record_error("Size Chart Absent", "%i sizes available" % len(product['sizes']))
         elif len(product['sizes']) == 1 and product['sizes'][0] in v_others.dumb_sizes and \
@@ -130,6 +134,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error(35, help_text="Size Chart present with Free size/Standard/Regular")
 
         # ------ CHK 3, Grinding the Model stats ---------------------------------------------------
+        #print "check 3"
         model_data = product.get('model_data')
         if model_data:
             # --------- CHK 3.1, Size check ---------------
@@ -203,6 +208,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error(47, help_text="Color N/A error")
 
         # ------ CHK 6.1, Assorted and multi --------------------------------------------------------
+        #print "check 6"
         def check_assorted_multi(a, b):
             if a in product['name']:
                 if b in spec_colors:
@@ -217,6 +223,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error(50, help_text="Both of assorted and multi are mentioned in name")
 
         # ------ CHK 6.2, Match colors against name and description --------------------------------
+        #print "check 6"
         for key in ['name', 'description']:
             if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color.get(key, [])):
                 record_error(db_fix.color_match_specs_map[key],
@@ -234,6 +241,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             record_error(55, help_text="Incomplete Model Vitals")
 
         # ------ CHK 8, Material check -------------------------------------------------------------
+        #print "check 8"
         material = specs.get("material")  # ASSUMPTION, gives a single material
         if material:
             pat = re.compile(r"(\d+|%)")
@@ -253,6 +261,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                                      str(material), str(desc_materials)))
 
         # ------ CHK 9, Package contents -----------------------------------------------------------
+        #print "check 9"
         numeric_set = ['set of', 'pack of', 'combo of']
         non_numeric_set = ['suit set']
         if any(x in product['desc'] for x in numeric_set + non_numeric_set) and 'package contents' not in specs:
@@ -267,18 +276,11 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 except:
                     record_error(58, help_text="Error in Package Contents")
 
+        #print 'end'
         return errors
     except Exception, e:
         raise
-        print "Received exception ", e
     finally:
-        if use_db:
-            if db:
-                db.close()
-            if dba:
-                dba.close()
-        print "Done, errors: "
-        print errors
         return errors
 
 
@@ -296,4 +298,6 @@ if __name__ == "__main__":
     url_package_1 = "http://www.jabong.com/jaipur-kurti-Multi-Colored-Printed-Cotton-Salwar-Kameez-Dupatta-1790943.html?pos=2"
     url_package_2 = "http://www.jabong.com/sir-michele-Sir-Michele-Ladies-Designer-Anklet-Socks5-Pairs-1851601.html?pos=1"
 
-    main_algorithm(url_package_2, sku="TestSub 1")
+    from souper import url1, url2, url3
+    errors = main_algorithm(url1, sku="TestSub 1")
+    print errors

@@ -1,35 +1,35 @@
-import pymysql
+from datetime import datetime
+from algo import main_algorithm
+import pprint
 
-import sys
 from var import cnx
 
-if len(sys.argv) < 3:
-    print "Please enter a runcode and console code"
-    quit()
+debug_mode = True
 
+data_stm = "SELECT url, sku, category, brick, brand from data"
+if debug_mode:
+    data_stm += " LIMIT 1000, 3"
+    run_table = "run_test"
+    result_table = "result_test"
+else:
+    run_table = "run"
+    result_table = "result"
 
-# name = {}
-# material_details = {}
-# count = 1
-# ------------------------ checkpoint 0, DB setup ----- Some kind of error reporting I guess ---------------------------
+start_time = datetime.now()  # start time of the run
 db = cnx.cursor()
-selq = "SELECT `error_code`,`error_desc` FROM error"        # TODO, change
-db.execute(selq)
-n_error = db.rowcount
 '''
-codes = {}
-for x in db:
-    codes[x[1]] = x[0]
+db.execute("INSERT into %s (start_time)" % run_table + " VALUES (%s)", start_time)
+run_code = list(db.execute("SELECT LAST_INSERT_ID()"))[0][0]  # the currently generated run code
 '''
-codes = dict((x[1], x[0]) for x in db)
 
-db.close()
-dba.close()
-del db
-del dba
-# seqer = {}        # keep count of number of errors in database
-
-# We will keep the main algorithm separate for sanity
-
-# ------------------------ checkpoint N, Final work --------------------------------------------------------------------
-# TODO, add rest of code
+printer = pprint.PrettyPrinter(indent=2)
+db.execute(data_stm)
+for row in db:
+    errors = main_algorithm(
+        url=row[0],
+        sku=row[1],
+        category=row[2].lower(),
+        brick=row[3].lower(),
+        brand=row[4]
+    )
+    printer.pprint({"url": row[0], "errors": errors})
