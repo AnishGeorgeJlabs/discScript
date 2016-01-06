@@ -8,7 +8,7 @@ debug_mode = True
 
 data_stm = "SELECT url, sku, category, brick, brand from data"
 if debug_mode:
-    data_stm += " LIMIT 100, 3"
+    data_stm += " LIMIT 100, 3844"
     run_table = "run_test"
     result_table = "result_test"
 else:
