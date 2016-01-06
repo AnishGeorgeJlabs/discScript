@@ -21,6 +21,8 @@ def get_data(url):
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
 
+    start_time = datetime.now()
+
     def find_by_class(c, tag="span"):
         obj = soup.find(tag, class_=c)
         if obj:
@@ -45,10 +47,11 @@ def get_data(url):
     for item in spec_list:
         if 'authorized-brand' in item.get('class', []):
             continue
-        specs[get_complete_string(item.label).strip().lower()] = get_complete_string(item.span).strip().lower()
+        specs[get_complete_string(item.label)] = get_complete_string(item.span)
+
     res['specs'] = specs
-    if 'model stats' in res['specs']:
-        res['model_data'] = extract_model_stats(res['specs']['model stats'])
+    if 'model stats' in specs:
+        res['model_data'] = extract_model_stats(specs['model stats'])
 
     # Get the item's category hierarchy from breadcrumbs
     bread = [
@@ -74,11 +77,15 @@ def get_data(url):
     else:
         items = size_blk.find_all("li")
         items = [x.find("span") for x in items if x]
-        sizes = [x.string.strip().lower() for x in items if x and x.string]
+        sizes = [x.string.strip().lower().replace('size', '') for x in items if x and x.string]
+        '''
         for x in sizes:
             x = x.replace("size", '').strip()
+            '''
 
     res['sizes'] = sizes
+    end_time = datetime.now()
+    print "Time taken: ", end_time - start_time
 
     return res, soup
 
@@ -97,5 +104,6 @@ def extract_model_stats(stats):
 
 if __name__ == "__main__":
     printer = pprint.PrettyPrinter(indent=2)
+    from datetime import datetime
     prod, soup = get_data(url2)
-    printer.pprint(prod)
+    #printer.pprint(prod)
