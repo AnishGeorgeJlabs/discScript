@@ -1,6 +1,7 @@
 import pymysql
 
 import sys
+from var import cnx
 
 if len(sys.argv) < 3:
     print "Please enter a runcode and console code"
@@ -11,9 +12,8 @@ if len(sys.argv) < 3:
 # material_details = {}
 # count = 1
 # ------------------------ checkpoint 0, DB setup ----- Some kind of error reporting I guess ---------------------------
-dba = pymysql.connect(host="localhost", user="root", passwd="", db="discrepancy")  # discrpancy
-db = dba.cursor()
-selq = "SELECT `error_code`,`error_desc` FROM error"
+db = cnx.cursor()
+selq = "SELECT `error_code`,`error_desc` FROM error"        # TODO, change
 db.execute(selq)
 n_error = db.rowcount
 '''

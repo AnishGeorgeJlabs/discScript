@@ -1,12 +1,8 @@
 import csv
 import re
 
-import pymysql
-
 from var import v_color, v_others, v_adv, db_fix
 from souper import get_data
-
-use_db = False
 
 
 def find_parent(c):
@@ -104,11 +100,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
     """
     errors = []  # the list of discrepancies we recording
     try:
-        # DB stuff
-        if use_db:
-            dba = pymysql.connect(host="localhost", user="root", passwd="", db="discrepancy")  # discrpancy
-            db = dba.cursor()
-        # --------------------
 
         product, soup = get_data(url)
         specs = product.get("specs")
@@ -127,15 +118,9 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             print "> %s: [%i] %s -- %s" % (sku, error_code, help_text, details)
 
         # ------ CHK 1, number of pics ----------------
-        if use_db:
-            db.execute("SELECT * FROM `Brick` WHERE `Name` = '" + brick + "'")
-            n_bricks = list(db)
-            # for x in db:
-            #     n_bricks.append(x)
-            if n_bricks[0][1] < product[
-                'n_images']:  # checks the no. of pics with the compliance db.todo, check the index
-                record_error(33, help_text="Error in number of images",
-                               details="shown: %i, required: %s" % (product['n_images'], str(n_bricks[0][1])))
+        if db_fix.brick_image_map[brick] < product['n_images']:
+            record_error(33, help_text="Error in number of images",
+                         details="shown: %i, required: %s" % (product['n_images'], str(db_fix.brick_image_map[brick])))
 
         # ------ CHK 2, Size chart and selections ------
         if len(product['sizes']) > 1 and not product['has_size_chart']:
@@ -153,8 +138,8 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 if all(x not in product['sizes'] for x in desc_sizes):
                     if len(product['sizes']) > 0:
                         record_error(36, help_text="Size worn by model not available for selection",
-                                       details="model has unavailable size of either - %s - or - %s -" % (
-                                           str(desc_sizes[0]), str(desc_sizes[-1])))
+                                     details="model has unavailable size of either - %s - or - %s -" % (
+                                         str(desc_sizes[0]), str(desc_sizes[-1])))
                     elif all(x not in v_others.dumb_sizes for x in desc_sizes):
                         record_error(37, help_text="Size worn by model is unknown")
 
@@ -167,11 +152,11 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                     val = model_data[key][:2]
                     if not unicode(val).isnumeric():
                         record_error(db_fix.vital_errors_map[key], help_text="Invalid %s size" % key,
-                                       details='Invalid size: %s' % str(val))
+                                     details='Invalid size: %s' % str(val))
 
             if "height" in model_data and model_data['height'] not in v_others.height_range:
                 record_error(db_fix.vital_errors_map['height'], help_text="Invalid height",
-                               details='Invalid size: %s' % str(model_data['height']))
+                             details='Invalid size: %s' % str(model_data['height']))
 
         # ------- CHK 4, Extracting data from description ------------------------------------------
         desc_data = {}
@@ -197,8 +182,8 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             for item in v:
                 if item not in product['specs'].get(k, ""):
                     record_error(45, help_text="%s details mismatch in description" % k,
-                                   details="for section: %s, description gives %s while specs give %s" % (
-                                       k, str(v), str(product['specs'].get(k, ''))))
+                                 details="for section: %s, description gives %s while specs give %s" % (
+                                     k, str(v), str(product['specs'].get(k, ''))))
 
         # ------ CHK 6, Segment - category specific checks, for color ------------------------------
         subcat = product.get("subcat", "")
@@ -235,7 +220,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         for key in ['name', 'description']:
             if any(not re.search(r"\b%s\b" % x, spec_colors) for x in color.get(key, [])):
                 record_error(db_fix.color_match_specs_map[key],
-                               help_text="Colors in %s not matching with specs" % key)
+                             help_text="Colors in %s not matching with specs" % key)
 
         # ------ CHK 6.3, check if the color is available in the list ------------------------------
         if any(c not in v_color.complete for c in spec_colors.split(',')):
@@ -264,8 +249,8 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                 c_material = pat.sub('', material)
                 if c_material not in desc_materials:
                     record_error(56, help_text="Mismatch in material",
-                                   details="material in specs: %s and in description: %s" % (
-                                   str(material), str(desc_materials)))
+                                 details="material in specs: %s and in description: %s" % (
+                                     str(material), str(desc_materials)))
 
         # ------ CHK 9, Package contents -----------------------------------------------------------
         numeric_set = ['set of', 'pack of', 'combo of']
