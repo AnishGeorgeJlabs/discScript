@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import pprint
 import requests
 import re
+from datetime import datetime
 
 url1 = "http://www.jabong.com/phosphorus-Mandarin-collar-oxford-casual-shirt-1570940.html?pos=1"
 url2 = "http://www.jabong.com/park-avenue-Blue-Striped-Slim-Fit-Formal-Shirt-1623073.html?pos=2"

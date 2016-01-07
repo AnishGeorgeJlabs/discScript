@@ -3,6 +3,7 @@ import re
 
 from var import v_color, v_others, v_adv, db_fix
 from souper import get_data
+from functions import split_para_into_sentences, has_item_value
 
 
 def find_parent(c):
@@ -97,9 +98,10 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
     """
     errors = []  # the list of discrepancies we recording
     try:
-
+        print "pre"
         product, soup = get_data(url)
         specs = product.get("specs")
+        print "after"
 
         if False:  # todo, check if the link is not alive
             with open('skipped_links.csv', 'a+') as cfile:
@@ -115,7 +117,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
             # print "> %s: [%i] %s -- %s" % (sku, error_code, help_text, details)
 
         # ------ CHK 1, number of pics ----------------
-        # print "check 1"
+        print "check 1"
         r_images = db_fix.brick_image_map.get(brick)
         if r_images and r_images < product['n_images']:
             record_error(33,
@@ -124,7 +126,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                          brick, product['n_images'], db_fix.brick_image_map.get(brick, 0)))
 
         # ------ CHK 2, Size chart and selections ------
-        # print "check 2"
+        print "check 2"
         if len(product['sizes']) > 1 and not product['has_size_chart']:
             record_error("Size Chart Absent", "%i sizes available" % len(product['sizes']))
         elif len(product['sizes']) == 1 and product['sizes'][0] in v_others.dumb_sizes and \
@@ -164,11 +166,35 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         # ------- CHK 4, Extracting data from description ------------------------------------------
         desc_data = {}
         color = {}
+        color['name'] = extract_colors(product['name'].lower())
         if not product.get('desc'):
             record_error(44, help_text="Discription Not Present")
         else:
             # ------ CHK 4.1, Colors --------------------------
-            color['description'] = extract_colors(product['desc'])  # Keep this separate
+            color['description'] = extract_colors(product['desc'])  # Keep this separate, todo change
+
+            desc_split = split_para_into_sentences(product['desc'])
+
+            for key in v_adv.spec_fields:
+                if key in specs:
+                    # step 1, get all the data from descriptions
+                    data = [
+                        item for item in v_adv.data_map[key]
+                        if any(has_item_value(sentence, item) for sentence in desc_split)
+                    ]
+                    # step 2, check if the spec item is there in the data, if there then remove it
+                    if specs[key] in data:
+                        data.pop(data.index(specs[key]))
+
+                    # step 3, filter out tricky words
+                    data = filter(lambda w: w not in v_adv.tricky_words, data)
+
+                    if len(data):
+                        record_error(45, help_text='%s details mismatch in description' % key,
+                                     details='for section: %s, description gives %s while specs give %s' %
+                                             (key, str(data), str(specs[key])))
+
+            '''
             # ------ CHK 4.2, Rest of the fields --------------
             for key in v_adv.spec_fields:
                 desc_data[key] = []
@@ -177,9 +203,9 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                         if key not in v_adv.tricky_fields or key in find_nearby(i, product['desc']):
                             desc_data[key].append(i)
             desc_data['fit'] = [x.replace("fit", "").replace('-', ' ').strip() for x in desc_data['fit']]
+            '''
 
-        color['name'] = extract_colors(product['name'].lower())
-
+        '''
         # ------ CHK 5, Basic Checks of description against specs ----------------------------------
         for k, v in desc_data.items():
             for item in v:
@@ -188,6 +214,7 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                                  details="for section: %s, description gives %s while specs give %s" % (
                                      k, str(v), str(product['specs'].get(k, ''))))
 
+        '''
         # ------ CHK 6, Segment - category specific checks, for color ------------------------------
         subcat = product.get("subcat", "")
         if subcat == "watches":
@@ -278,8 +305,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         return errors
     except Exception, e:
         raise
-    finally:
-        return errors
 
 
 '''
@@ -296,7 +321,7 @@ if __name__ == "__main__":
     url_package_1 = "http://www.jabong.com/jaipur-kurti-Multi-Colored-Printed-Cotton-Salwar-Kameez-Dupatta-1790943.html?pos=2"
     url_package_2 = "http://www.jabong.com/sir-michele-Sir-Michele-Ladies-Designer-Anklet-Socks5-Pairs-1851601.html?pos=1"
 
-    from souper import url1
+    from souper import url1, url2, url3, url_multi
 
     errors = main_algorithm(url1, sku="TestSub 1")
     print errors

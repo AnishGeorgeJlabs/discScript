@@ -64,3 +64,4 @@ data_map = {
 spec_fields = data_map.keys()
 
 tricky_fields = ['lining']
+tricky_words = ['ethnic', 'fabric']
