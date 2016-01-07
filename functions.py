@@ -21,7 +21,7 @@ def has_clubbing(pre_sentence):
     return False
 
 def get_pre_sentence(pre_para):
-    """
+    """ Deprecated
     Gets the starting part of a sentence, by traversing back until getting the end of the previous sentence
     :param pre_para: the first part of the para before the split
     :return:
@@ -32,17 +32,23 @@ def get_pre_sentence(pre_para):
     return pre_para
 
 
-def has_item_value(para, item):
+def has_item_value(sentence, item):
     """
-    Check whether the para contains the given item property and that it actually belongs to the product in question
-    :param para: The full description
+    Check whether the sentence contains the given item property and that it actually belongs to the product in question
+    use with any() for a list of description sentences
+    :param sentence: The full sentence of the description
     :param item:
     :return:
     """
-    sp = re.split(r"\b%s\b" % item, para, maxsplit=1)
+    sp = re.split(r"\b%s\b" % item, sentence, maxsplit=1)
     if len(sp) == 1:
         return False
-    elif not has_clubbing(get_pre_sentence(sp[0])):   # todo, modify to get the string uptil the last sentence end
+    elif not has_clubbing(sp[0]):
         return True
     else:
         return has_item_value(sp[1], item)      # Not to loose hope, we might just get another match
+
+
+def split_para_into_sentences(para):
+    """ Returns an array of sentences """
+    return re.split(r'[.,;]', para)
