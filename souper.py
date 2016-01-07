@@ -40,7 +40,7 @@ def get_data(url):
         "brand": find_by_class("brand"),
         "has_size_chart": bool(soup.find(id="size-block").find("a", class_="help dialogify")),
         "has_video": bool(soup.find("div", class_='b-prod-video')),
-        "desc": clean_para(find_by_class("prod-disc", "h2")),
+        "desc": find_by_class("prod-disc", "h2"),
         "n_images": len(soup.find("div", class_="product-carousel").find_all("img"))
     }
     if res['desc']:
