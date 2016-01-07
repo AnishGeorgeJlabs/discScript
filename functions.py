@@ -3,7 +3,7 @@ Contains various functions needed by the algorithm
 """
 import re
 
-club_words = ['team', 'pair', 'club', 'wear', 'style', 'combine']
+club_words = ['team', 'pair', 'club', 'wear', 'style', 'combine', 'match']
 # The idea is that if a sentence is of the form ...<club_word>...with...<match-object> then we ignore the match
 
 def has_clubbing(pre_sentence):
@@ -20,6 +20,17 @@ def has_clubbing(pre_sentence):
             return True
     return False
 
+def get_pre_sentence(pre_para):
+    """
+    Gets the starting part of a sentence, by traversing back until getting the end of the previous sentence
+    :param pre_para: the first part of the para before the split
+    :return:
+    """
+    for i in range(len(pre_para) - 1, -1, -1):
+        if pre_para[i] in ".,;":
+            return pre_para[i+1:]
+    return pre_para
+
 
 def has_item_value(para, item):
     """
@@ -28,3 +39,10 @@ def has_item_value(para, item):
     :param item:
     :return:
     """
+    sp = re.split(r"\b%s\b" % item, para, maxsplit=1)
+    if len(sp) == 1:
+        return False
+    elif not has_clubbing(get_pre_sentence(sp[0])):   # todo, modify to get the string uptil the last sentence end
+        return True
+    else:
+        return has_item_value(sp[1], item)      # Not to loose hope, we might just get another match
