@@ -27,6 +27,7 @@ print "GOT run code: ", run_code
 printer = pprint.PrettyPrinter(indent=2)
 db.execute(data_stm)
 data = list(db)
+#substm = "INSERT INTO %s (fk_run, fk_sku, fk_error, details)" % result_table + " VALUES "
 for row in data:
     errors = main_algorithm(
         url=row[0],
