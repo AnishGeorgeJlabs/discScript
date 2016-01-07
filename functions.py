@@ -32,7 +32,7 @@ def get_pre_sentence(pre_para):
     return pre_para
 
 
-def has_item_value(sentence, item):
+def has_item_value(sentence, item, check_key=False, key=""):
     """
     Check whether the sentence contains the given item property and that it actually belongs to the product in question
     use with any() for a list of description sentences
@@ -44,7 +44,10 @@ def has_item_value(sentence, item):
     if len(sp) == 1:
         return False
     elif not has_clubbing(sp[0]):
-        return True
+        if check_key:
+            return key in sp[0] or key in sp[1]
+        else:
+            return True
     else:
         return has_item_value(sp[1], item)      # Not to loose hope, we might just get another match
 

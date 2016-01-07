@@ -180,7 +180,9 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                     # step 1, get all the data from descriptions
                     data = [
                         item for item in v_adv.data_map[key]
-                        if any(has_item_value(sentence, item) for sentence in desc_split)
+                        if any(
+                            has_item_value(sentence, item, check_key=key in v_adv.tricky_fields, key=key)
+                            for sentence in desc_split)
                     ]
                     # step 2, check if the spec item is there in the data, if there then remove it
                     if specs[key] in data:
@@ -322,6 +324,8 @@ if __name__ == "__main__":
     url_package_2 = "http://www.jabong.com/sir-michele-Sir-Michele-Ladies-Designer-Anklet-Socks5-Pairs-1851601.html?pos=1"
 
     from souper import url1, url2, url3, url_multi
+    import pprint
 
-    errors = main_algorithm(url1, sku="TestSub 1")
-    print errors
+    errors = main_algorithm(url_package_2, sku="TestSub 1")
+    printer = pprint.PrettyPrinter(indent=4)
+    printer.pprint(errors)
