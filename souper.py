@@ -29,12 +29,15 @@ def get_data(url):
 
     start_time = datetime.now()
 
-    def find_by_class(c, tag="span"):
-        obj = soup.find(tag, class_=c)
+    def find_by_class(c, tag=None):
+        if tag:
+            obj = soup.find(tag, class_=c)
+        else:
+            obj = soup.find(class_=c)
         if obj:
             return get_complete_string(obj)
         else:
-            return None
+            return ''
 
     res = {
         "name": find_by_class("product-title").lower(),
