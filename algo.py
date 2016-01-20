@@ -196,27 +196,6 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
                                      details='for section: %s, description gives %s while specs give %s' %
                                              (key, str(data), str(specs[key])))
 
-            '''
-            # ------ CHK 4.2, Rest of the fields --------------
-            for key in v_adv.spec_fields:
-                desc_data[key] = []
-                for i in v_adv.data_map[key]:
-                    if re.search(r'\b%s\b' % i, product['desc'], re.IGNORECASE):
-                        if key not in v_adv.tricky_fields or key in find_nearby(i, product['desc']):
-                            desc_data[key].append(i)
-            desc_data['fit'] = [x.replace("fit", "").replace('-', ' ').strip() for x in desc_data['fit']]
-            '''
-
-        '''
-        # ------ CHK 5, Basic Checks of description against specs ----------------------------------
-        for k, v in desc_data.items():
-            for item in v:
-                if item not in product['specs'].get(k, ""):
-                    record_error(45, help_text="%s details mismatch in description" % k,
-                                 details="for section: %s, description gives %s while specs give %s" % (
-                                     k, str(v), str(product['specs'].get(k, ''))))
-
-        '''
         # ------ CHK 6, Segment - category specific checks, for color ------------------------------
         subcat = product.get("subcat", "")
         if subcat == "watches":
@@ -306,7 +285,9 @@ def main_algorithm(url, prod_id="", brick="", category="", sku="", brand="", mrp
         # print 'end'
         return errors
     except Exception, e:
-        raise
+        print "caught exception: "+str(e)
+    finally:
+        return errors
 
 
 '''

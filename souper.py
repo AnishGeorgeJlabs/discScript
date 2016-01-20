@@ -27,7 +27,7 @@ def get_data(url):
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
 
-    start_time = datetime.now()
+    #start_time = datetime.now()
 
     def find_by_class(c, tag=None):
         if tag:
@@ -93,8 +93,8 @@ def get_data(url):
             '''
 
     res['sizes'] = sizes
-    end_time = datetime.now()
-    print "Time taken: ", end_time - start_time
+    #end_time = datetime.now()
+    #print "Time taken: ", end_time - start_time
 
     return res, soup
 
